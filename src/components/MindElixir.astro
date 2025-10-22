@@ -55,7 +55,7 @@ const defaultData = data || {
   id={id} 
   class="mind-elixir-container"
   data-mind-data={JSON.stringify(defaultData)}
-  style={`height: ${height}; width: 100%; border: 1px solid #ccc; border-radius: 8px;`}>
+  style={`height: ${height}; width: 100%; border: 1px solid #ccc; border-radius: 8px; overflow: auto; touch-action: none;`}>
 </div>
 
 <script>
@@ -83,6 +83,51 @@ const defaultData = data || {
           });
 
           mind.init(data);
+          
+          // Agregar soporte de pan/scroll táctil para navegar el diagrama
+          const mindElixirElement = container.querySelector('.mind-elixir');
+          if (mindElixirElement) {
+            let isPanning = false;
+            let startX = 0;
+            let startY = 0;
+            let scrollLeft = 0;
+            let scrollTop = 0;
+            
+            // Detectar inicio del toque (con 2 dedos para pan)
+            mindElixirElement.addEventListener('touchstart', (e: Event) => {
+              const touchEvent = e as TouchEvent;
+              // Pan con 2 dedos o con 1 dedo si no hay nodo seleccionado
+              const target = touchEvent.target as HTMLElement;
+              if (touchEvent.touches.length === 2 || (touchEvent.touches.length === 1 && !target?.closest('.node'))) {
+                isPanning = true;
+                startX = touchEvent.touches[0].clientX;
+                startY = touchEvent.touches[0].clientY;
+                scrollLeft = container.scrollLeft;
+                scrollTop = container.scrollTop;
+                touchEvent.preventDefault();
+              }
+            }, { passive: false });
+            
+            // Detectar movimiento del toque
+            mindElixirElement.addEventListener('touchmove', (e: Event) => {
+              if (isPanning) {
+                const touchEvent = e as TouchEvent;
+                const x = touchEvent.touches[0].clientX;
+                const y = touchEvent.touches[0].clientY;
+                const walkX = (startX - x) * 1.5; // Multiplicador para sensibilidad
+                const walkY = (startY - y) * 1.5;
+                
+                container.scrollLeft = scrollLeft + walkX;
+                container.scrollTop = scrollTop + walkY;
+                touchEvent.preventDefault();
+              }
+            }, { passive: false });
+            
+            // Detectar fin del toque
+            mindElixirElement.addEventListener('touchend', () => {
+              isPanning = false;
+            }, { passive: true });
+          }
           
           console.log('Mind Elixir inicializado correctamente en:', id);
         } catch (err) {
