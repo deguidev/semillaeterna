@@ -1,0 +1,106 @@
+---
+// Componente para integrar Mind Elixir en Astro
+interface Props {
+  id?: string;
+  data?: any;
+  height?: string;
+}
+
+const { id = 'mind-map', data, height = '500px' } = Astro.props;
+
+// Datos por defecto para el mapa mental
+const defaultData = data || {
+  nodeData: {
+    id: 'root',
+    topic: 'Mapa Mental de Prédicas',
+    root: true,
+    children: [
+      {
+        id: '1',
+        topic: 'Fundamentos de Fe',
+        direction: 0,
+        children: [
+          { id: '1-1', topic: 'La Salvación', direction: 0 },
+          { id: '1-2', topic: 'La Gracia', direction: 0 },
+          { id: '1-3', topic: 'El Evangelio', direction: 0 }
+        ]
+      },
+      {
+        id: '2',
+        topic: 'Vida Cristiana',
+        direction: 1,
+        children: [
+          { id: '2-1', topic: 'Oración', direction: 1 },
+          { id: '2-2', topic: 'Lectura Bíblica', direction: 1 },
+          { id: '2-3', topic: 'Comunión', direction: 1 }
+        ]
+      },
+      {
+        id: '3',
+        topic: 'Servicio',
+        direction: 0,
+        children: [
+          { id: '3-1', topic: 'Evangelismo', direction: 0 },
+          { id: '3-2', topic: 'Discipulado', direction: 0 }
+        ]
+      }
+    ]
+  }
+};
+---
+
+<link rel="stylesheet" href="/mind-elixir.css" />
+
+<div 
+  id={id} 
+  class="mind-elixir-container"
+  data-mind-data={JSON.stringify(defaultData)}
+  style={`height: ${height}; width: 100%; border: 1px solid #ccc; border-radius: 8px;`}>
+</div>
+
+<script>
+  import MindElixir from 'mind-elixir';
+  
+  // Inicializar todos los contenedores de Mind Elixir en la página
+  document.addEventListener('DOMContentLoaded', () => {
+    const containers = document.querySelectorAll('.mind-elixir-container');
+    
+    containers.forEach((container) => {
+      const id = container.id;
+      const dataStr = container.getAttribute('data-mind-data');
+      
+      if (dataStr) {
+        try {
+          const data = JSON.parse(dataStr);
+          
+          const mind = new MindElixir({
+            el: `#${id}`,
+            direction: MindElixir.LEFT,
+            draggable: true,
+            contextMenu: true,
+            toolBar: true,
+            keypress: true
+          });
+
+          mind.init(data);
+          
+          console.log('Mind Elixir inicializado correctamente en:', id);
+        } catch (err) {
+          console.error('Error al inicializar Mind Elixir:', err);
+        }
+      }
+    });
+  });
+</script>
+
+<style>
+  /* Estilos adicionales para Mind Elixir */
+  :global(.mind-elixir) {
+    font-family: system-ui, -apple-system, sans-serif;
+  }
+  
+  :global(.mind-elixir-toolbar) {
+    background: var(--sl-color-bg-nav);
+    border-bottom: 1px solid var(--sl-color-gray-5);
+  }
+</style>
