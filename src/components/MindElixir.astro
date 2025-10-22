@@ -1,5 +1,5 @@
 ---
-// Componente para integrar Mind Elixir en Astro
+// Componente mejorado para integrar Mind Elixir en Astro con pan táctil
 interface Props {
   id?: string;
   data?: any;
@@ -55,13 +55,12 @@ const defaultData = data || {
   id={id} 
   class="mind-elixir-container"
   data-mind-data={JSON.stringify(defaultData)}
-  style={`height: ${height}; width: 100%; border: 1px solid #ccc; border-radius: 8px; overflow: auto; touch-action: none;`}>
+  style={`height: ${height}; width: 100%; border: 1px solid #ccc; border-radius: 8px; overflow: hidden; position: relative;`}>
 </div>
 
 <script>
   import MindElixir from 'mind-elixir';
   
-  // Inicializar todos los contenedores de Mind Elixir en la página
   document.addEventListener('DOMContentLoaded', () => {
     const containers = document.querySelectorAll('.mind-elixir-container');
     
@@ -84,50 +83,132 @@ const defaultData = data || {
 
           mind.init(data);
           
-          // Agregar soporte de pan/scroll táctil para navegar el diagrama
-          const mindElixirElement = container.querySelector('.mind-elixir');
-          if (mindElixirElement) {
-            let isPanning = false;
-            let startX = 0;
-            let startY = 0;
-            let scrollLeft = 0;
-            let scrollTop = 0;
-            
-            // Detectar inicio del toque (con 2 dedos para pan)
-            mindElixirElement.addEventListener('touchstart', (e: Event) => {
-              const touchEvent = e as TouchEvent;
-              // Pan con 2 dedos o con 1 dedo si no hay nodo seleccionado
-              const target = touchEvent.target as HTMLElement;
-              if (touchEvent.touches.length === 2 || (touchEvent.touches.length === 1 && !target?.closest('.node'))) {
-                isPanning = true;
-                startX = touchEvent.touches[0].clientX;
-                startY = touchEvent.touches[0].clientY;
-                scrollLeft = container.scrollLeft;
-                scrollTop = container.scrollTop;
-                touchEvent.preventDefault();
-              }
-            }, { passive: false });
-            
-            // Detectar movimiento del toque
-            mindElixirElement.addEventListener('touchmove', (e: Event) => {
-              if (isPanning) {
-                const touchEvent = e as TouchEvent;
-                const x = touchEvent.touches[0].clientX;
-                const y = touchEvent.touches[0].clientY;
-                const walkX = (startX - x) * 1.5; // Multiplicador para sensibilidad
-                const walkY = (startY - y) * 1.5;
+          // Agregar soporte de pan táctil usando transformación
+          setTimeout(() => {
+            const svg = container.querySelector('svg');
+            if (svg) {
+              let isPanning = false;
+              let startX = 0;
+              let startY = 0;
+              let currentTranslateX = 0;
+              let currentTranslateY = 0;
+              
+              // Crear grupo wrapper si no existe
+              let group = svg.querySelector('.pan-group');
+              if (!group) {
+                group = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+                group.classList.add('pan-group');
                 
-                container.scrollLeft = scrollLeft + walkX;
-                container.scrollTop = scrollTop + walkY;
-                touchEvent.preventDefault();
+                // Mover todos los hijos al grupo
+                while (svg.firstChild) {
+                  group.appendChild(svg.firstChild);
+                }
+                svg.appendChild(group);
               }
-            }, { passive: false });
-            
-            // Detectar fin del toque
-            mindElixirElement.addEventListener('touchend', () => {
-              isPanning = false;
-            }, { passive: true });
-          }
+              
+              // Variables para zoom
+              let currentScale = 1;
+              const minScale = 0.5;
+              const maxScale = 3;
+              
+              // Eventos táctiles para pan y zoom
+              svg.addEventListener('touchstart', (e) => {
+                if (e.touches.length === 1) {
+                  isPanning = true;
+                  startX = e.touches[0].clientX;
+                  startY = e.touches[0].clientY;
+                } else if (e.touches.length === 2) {
+                  isPanning = false;
+                  // Calcular distancia inicial entre dos dedos
+                  const dx = e.touches[0].clientX - e.touches[1].clientX;
+                  const dy = e.touches[0].clientY - e.touches[1].clientY;
+                  startX = Math.sqrt(dx * dx + dy * dy);
+                }
+              }, { passive: true });
+              
+              svg.addEventListener('touchmove', (e) => {
+                if (isPanning && e.touches.length === 1) {
+                  const deltaX = e.touches[0].clientX - startX;
+                  const deltaY = e.touches[0].clientY - startY;
+                  
+                  currentTranslateX += deltaX;
+                  currentTranslateY += deltaY;
+                  
+                  group.setAttribute('transform', `translate(${currentTranslateX}, ${currentTranslateY}) scale(${currentScale})`);
+                  
+                  startX = e.touches[0].clientX;
+                  startY = e.touches[0].clientY;
+                } else if (e.touches.length === 2) {
+                  // Zoom con pellizco
+                  const dx = e.touches[0].clientX - e.touches[1].clientX;
+                  const dy = e.touches[0].clientY - e.touches[1].clientY;
+                  const distance = Math.sqrt(dx * dx + dy * dy);
+                  
+                  const scale = distance / startX;
+                  const newScale = currentScale * scale;
+                  
+                  if (newScale >= minScale && newScale <= maxScale) {
+                    currentScale = newScale;
+                    group.setAttribute('transform', `translate(${currentTranslateX}, ${currentTranslateY}) scale(${currentScale})`);
+                    startX = distance;
+                  }
+                }
+              }, { passive: true });
+              
+              svg.addEventListener('touchend', () => {
+                isPanning = false;
+              }, { passive: true });
+              
+              // También agregar soporte para mouse (para testing en desktop)
+              let isMousePanning = false;
+              let mouseStartX = 0;
+              let mouseStartY = 0;
+              
+              svg.addEventListener('mousedown', (e) => {
+                if (e.button === 0 || e.button === 2) { // Click izquierdo o derecho
+                  isMousePanning = true;
+                  mouseStartX = e.clientX;
+                  mouseStartY = e.clientY;
+                }
+              });
+              
+              // Zoom con rueda del mouse
+              svg.addEventListener('wheel', (e) => {
+                e.preventDefault();
+                const delta = e.deltaY > 0 ? 0.9 : 1.1;
+                const newScale = currentScale * delta;
+                
+                if (newScale >= minScale && newScale <= maxScale) {
+                  currentScale = newScale;
+                  group.setAttribute('transform', `translate(${currentTranslateX}, ${currentTranslateY}) scale(${currentScale})`);
+                }
+              }, { passive: false });
+              
+              document.addEventListener('mousemove', (e) => {
+                if (isMousePanning) {
+                  const deltaX = e.clientX - mouseStartX;
+                  const deltaY = e.clientY - mouseStartY;
+                  
+                  currentTranslateX += deltaX;
+                  currentTranslateY += deltaY;
+                  
+                  group.setAttribute('transform', `translate(${currentTranslateX}, ${currentTranslateY}) scale(${currentScale})`);
+                  
+                  mouseStartX = e.clientX;
+                  mouseStartY = e.clientY;
+                }
+              });
+              
+              // Prevenir clic derecho
+              svg.addEventListener('contextmenu', (e) => {
+                e.preventDefault();
+              });
+              
+              document.addEventListener('mouseup', () => {
+                isMousePanning = false;
+              });
+            }
+          }, 500);
           
           console.log('Mind Elixir inicializado correctamente en:', id);
         } catch (err) {
@@ -139,7 +220,6 @@ const defaultData = data || {
 </script>
 
 <style>
-  /* Estilos adicionales para Mind Elixir */
   :global(.mind-elixir) {
     font-family: system-ui, -apple-system, sans-serif;
   }
@@ -147,5 +227,9 @@ const defaultData = data || {
   :global(.mind-elixir-toolbar) {
     background: var(--sl-color-bg-nav);
     border-bottom: 1px solid var(--sl-color-gray-5);
+  }
+  
+  :global(.pan-group) {
+    transition: none;
   }
 </style>
