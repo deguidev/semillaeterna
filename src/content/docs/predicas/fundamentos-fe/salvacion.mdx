@@ -8,7 +8,7 @@ import { Tabs, TabItem } from '@astrojs/starlight/components';
 import { Badge } from '@astrojs/starlight/components';
 import { Aside } from '@astrojs/starlight/components';
 import { Steps } from '@astrojs/starlight/components';
-import MindElixir from '@components/MindElixir.astro';
+import Markmap from '@components/Markmap.astro';
 
 # La Salvación: Un Regalo de Dios
 
@@ -50,60 +50,52 @@ La Biblia enseña que todos hemos pecado y estamos separados de Dios. La salvaci
      "que si confesares con tu boca que Jesús es el Señor, y creyeres en tu corazón que Dios le levantó de los muertos, serás salvo." (Romanos 10:9)
 </Steps>
 
-## Mapa Mental de la Salvación
+## Resumen visual
 
-Este mapa mental resume los conceptos clave de la salvación:
+Los conceptos clave de la salvación se pueden recordar con cuatro ideas sencillas:
 
-<MindElixir 
-  id="salvacion-map" 
-  height="500px"
-  data={{
-    nodeData: {
-      id: 'root',
-      topic: 'La Salvación',
-      root: true,
-      children: [
-        {
-          id: 'necesidad',
-          topic: 'Nuestra Necesidad',
-          direction: 0,
-          children: [
-            { id: 'pecado', topic: 'El Pecado nos separa de Dios' },
-            { id: 'condenacion', topic: 'La paga del pecado es muerte' }
-          ]
-        },
-        {
-          id: 'solucion',
-          topic: 'La Solución de Dios',
-          direction: 1,
-          children: [
-            { id: 'cristo', topic: 'Jesús murió por nosotros' },
-            { id: 'gracia', topic: 'Es un regalo, no por obras' }
-          ]
-        },
-        {
-          id: 'respuesta',
-          topic: 'Nuestra Respuesta',
-          direction: 0,
-          children: [
-            { id: 'arrepentimiento', topic: 'Arrepentimiento (apartarse del pecado)' },
-            { id: 'fe', topic: 'Fe (confiar en Jesús)' }
-          ]
-        },
-        {
-          id: 'resultado',
-          topic: 'El Resultado',
-          direction: 1,
-          children: [
-            { id: 'perdon', topic: 'Perdón de pecados' },
-            { id: 'vida_eterna', topic: 'Vida Eterna' },
-            { id: 'nueva_vida', topic: 'Una nueva vida en Cristo' }
-          ]
-        }
-      ]
-    }
-  }}
+<Markmap 
+  height="600px"
+  content={`# La Salvación
+
+## 1. Nuestra Necesidad
+- El pecado nos separa de Dios
+- Todos hemos pecado \n (Romanos 3:23)
+- La paga del pecado es muerte
+- No podemos salvarnos por obras
+
+## 2. La Solución de Dios
+- Jesús vino a la tierra
+- Vivió una vida perfecta
+- Murió en la cruz por nuestros pecados
+- Resucitó al tercer día
+- Es el único camino \n(Juan 14:6)
+
+## 3. Nuestra Respuesta
+- **Arrepentimiento**
+    - Reconocer nuestro pecado
+    - Apartarse del pecado
+- **Fe en Cristo**
+    - Creer que Jesús murió por nosotros
+    - Confiar en Él como Salvador
+- **Confesión**
+    - Confesar con la boca \n(Romanos 10:9)
+
+## 4. El Resultado
+- Perdón de pecados
+- Vida eterna
+- Nueva identidad como hijos de Dios
+- Paz con Dios
+- Esperanza del cielo
+- Transformación del corazón`}
 />
+
+**Puntos clave para recordar:**
+
+- **Nuestra necesidad**: el pecado nos separa de Dios y trae condenación.
+- **La solución de Dios**: Jesús murió y resucitó para ofrecernos gracia.
+- **Nuestra respuesta**: arrepentimiento sincero y fe en Cristo.
+- **El resultado**: perdón, vida eterna y una nueva vida en Cristo.
 
 ## ¿Qué pasa después de ser salvo?
 

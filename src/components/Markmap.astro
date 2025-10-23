@@ -1,0 +1,161 @@
+---
+import { Transformer } from 'markmap-lib';
+
+interface Props {
+  id?: string;
+  height?: string;
+  content: string;
+}
+
+const { id, height = '500px', content } = Astro.props as Props;
+
+if (!content) {
+  throw new Error('Markmap: se requiere la prop "content" con el markdown.');
+}
+
+const elementId = id ?? `markmap-${Math.random().toString(36).slice(2, 9)}`;
+
+// Función para asegurar que el markdown tenga el formato correcto
+const formatMarkdown = (md: string) => {
+  // Primero, normalizar los saltos de línea
+  let result = md.replace(/\r\n/g, '\n');
+  
+  // Asegurar que los elementos de lista usen guiones consistentemente
+  result = result.replace(/^\s*\*/gm, '-');
+  
+  // Preservar la jerarquía de las listas anidadas
+  // Convertir sangrías de tabulaciones a 2 espacios
+  result = result.replace(/\t/g, '  ');
+  
+  // Asegurar que los elementos de lista tengan un espacio después del guión
+  result = result.replace(/^(\s*)-(\S)/gm, '$1- $2');
+  
+  // Asegurar que haya una línea en blanco antes de las listas después de encabezados
+  result = result.replace(/(## .+)\n-/g, '$1\n\n-');
+  
+  return result;
+};
+
+const formattedContent = formatMarkdown(content);
+const transformer = new Transformer();
+const { root } = transformer.transform(formattedContent);
+const assets = transformer.getAssets();
+
+const dataStr = JSON.stringify(root ?? {});
+const assetsStr = JSON.stringify(assets ?? {});
+---
+
+<div class="markmap-wrapper" style={`height: ${height};`}>
+  <svg id={elementId} class="markmap-svg" xmlns="http://www.w3.org/2000/svg" data-markmap-data={dataStr}></svg>
+</div>
+
+<style>
+  .markmap-wrapper {
+    background: #f9f7f0; /* Fondo blanco amarillento suave para el contenedor */
+    border-radius: 0.5rem;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); /* Sutil sombra para mejor contraste */
+  }
+  
+  .markmap-svg {
+    width: 100%;
+    height: 100%;
+    background: #fdfcf8; /* Fondo ligeramente más claro para el SVG */
+  }
+  
+  /* Asegurar que el fondo se vea bien en todos los navegadores */
+  @media (forced-colors: active) {
+    .markmap-svg {
+      forced-color-adjust: none;
+    }
+  }
+</style>
+
+<script>
+  import { Markmap } from 'markmap-view';
+
+  // Función para inicializar un markmap específico
+  function initializeMarkmap(svg: SVGElement) {
+    const dataStr = svg.getAttribute('data-markmap-data');
+    
+    if (!dataStr) {
+      // No se encontraron datos en el SVG
+      return;
+    }
+
+    try {
+      const data = JSON.parse(dataStr);
+      
+      // Inicializando Markmap
+      
+      const mm = Markmap.create(svg, {
+        duration: 500,
+        maxWidth: 0,
+        initialExpandLevel: 10,  // Asegurarse de que todos los niveles se muestren
+        fitRatio: 0.95,
+        nodeMinHeight: 16,       // Altura mínima para los nodos
+        spacingVertical: 5,      // Espaciado vertical entre nodos
+        spacingHorizontal: 80,   // Espaciado horizontal entre nodos
+        paddingX: 8,             // Relleno horizontal
+      }, data);
+      
+      // Markmap inicializado exitosamente
+      
+    } catch (err) {
+      // Error al inicializar Markmap
+    }
+  }
+
+  // Ocultar cualquier imagen estática que se esté mostrando
+  const hideStaticOverlay = `
+    document.querySelectorAll('img[src*="markmap"]').forEach(img => {
+      img.style.display = 'none';
+    });
+  `;
+
+  // Inicializar el markmap
+  document.addEventListener('DOMContentLoaded', () => {
+    // Ocultar overlay estático
+    eval(hideStaticOverlay);
+    
+    // Inicializar markmap
+    const markmapSvgs = document.querySelectorAll('.markmap-svg');
+    markmapSvgs.forEach((svg) => {
+      // Limpiar cualquier contenido previo
+      while (svg.firstChild) {
+        svg.removeChild(svg.firstChild);
+      }
+      initializeMarkmap(svg as unknown as SVGElement);
+    });
+  });
+
+  // También inicializar si el DOM ya está listo
+  if (document.readyState !== 'loading') {
+    // Pequeño retraso para asegurar que el DOM esté listo
+    setTimeout(() => {
+      eval(hideStaticOverlay);
+      const markmapSvgs = document.querySelectorAll('.markmap-svg');
+      markmapSvgs.forEach((svg) => {
+        while (svg.firstChild) {
+          svg.removeChild(svg.firstChild);
+        }
+        initializeMarkmap(svg as unknown as SVGElement);
+      });
+    }, 50);
+  }
+</script>
+
+<style>
+  .markmap-wrapper {
+    width: 100%;
+    border: 1px solid var(--sl-color-gray-5);
+    border-radius: 12px;
+    overflow: hidden;
+    background: var(--sl-color-bg);
+  }
+
+  .markmap-svg {
+    width: 100%;
+    height: 100%;
+  }
+</style>
