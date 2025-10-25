@@ -15,6 +15,24 @@ if (!content) {
 
 const elementId = id ?? `markmap-${Math.random().toString(36).slice(2, 9)}`;
 
+// URL base para BibleGateway
+const BIBLE_GATEWAY_URL = 'https://www.biblegateway.com/passage/?search=';
+const BIBLE_VERSION = 'RVR1960';
+
+// Función para convertir referencias bíblicas en enlaces
+const addBibleLinks = (md: string) => {
+  // Patrón mejorado para detectar referencias bíblicas (ej: "Juan 3:16", "1 Corintios 13:1-13", "Salmos 23:1")
+  // Soporta libros con números (1 Juan, 2 Corintios), con tildes y la letra ñ
+  const bibleRefPattern = /^(\s*-\s+)([0-9]?\s*[A-ZÁÉÍÓÚa-záéíóúñÑ]+(?:\s+[A-ZÁÉÍÓÚa-záéíóúñÑ]+)*\s+[0-9]+:[0-9]+(?:-[0-9]+)?)$/gm;
+  
+  return md.replace(bibleRefPattern, (match, prefix, reference) => {
+    // Codificar la referencia para URL
+    const encodedRef = encodeURIComponent(reference.trim());
+    // Crear el enlace HTML
+    return `${prefix}<a href="${BIBLE_GATEWAY_URL}${encodedRef}&version=${BIBLE_VERSION}" target="_blank">${reference}</a>`;
+  });
+};
+
 // Función para asegurar que el markdown tenga el formato correcto
 const formatMarkdown = (md: string) => {
   // Primero, normalizar los saltos de línea
@@ -32,6 +50,9 @@ const formatMarkdown = (md: string) => {
   
   // Asegurar que haya una línea en blanco antes de las listas después de encabezados
   result = result.replace(/(## .+)\n-/g, '$1\n\n-');
+  
+  // Agregar enlaces a referencias bíblicas
+  result = addBibleLinks(result);
   
   return result;
 };
