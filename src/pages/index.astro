@@ -1,47 +1,17 @@
 ---
 import MainLayout from '../layouts/MainLayout.astro';
+import Hero from '../components/pages/Hero.astro';
+import Content from '../components/pages/Content.astro';
+import Footer from '../components/pages/footer.astro';
 ---
 
-<MainLayout title="Inicio - Mi Sitio">
-	<!-- Hero Section -->
-	<div class="min-h-screen flex items-center justify-center bg-linear-to-br from-indigo-500 to-purple-600 text-white text-center p-8">
-		<div class="max-w-6xl mx-auto px-4">
-			<h1 class="text-5xl md:text-6xl font-bold mb-4 leading-tight">
-				Bienvenido a Mi Sitio d
-			</h1>
-			<p class="text-xl md:text-2xl mb-8 opacity-90">
-				Esta es tu página principal personalizada
-			</p>
-			
-			<div class="flex flex-col md:flex-row gap-4 justify-center items-center flex-wrap">
-				<a 
-					href="/predicas/example" 
-					class="inline-block px-8 py-4 bg-white text-indigo-600 rounded-lg font-semibold text-lg transition-all duration-300 hover:-translate-y-0.5 hover:shadow-xl cursor-pointer"
-				>
-					Ver Documentación
-				</a>
-				<a 
-					href="#about" 
-					class="inline-block px-8 py-4 bg-transparent text-white border-2 border-white rounded-lg font-semibold text-lg transition-all duration-300 hover:bg-white hover:text-indigo-600 hover:-translate-y-0.5"
-				>
-					Conocer Más
-				</a>
-			</div>
-		</div>
-	</div>
+<MainLayout title="Semilla Eterna - Prédicas y Sermones">
+	<!-- Hero Section with Book Carousels -->
+	<Hero />
 
-	<!-- About Section -->
-	<section id="about" class="py-16 px-8 bg-gray-50">
-		<div class="max-w-6xl mx-auto px-4">
-			<h2 class="text-4xl font-bold mb-6 text-gray-800">
-				Sobre Este Proyecto
-			</h2>
-			<p class="text-xl text-gray-600 mb-4 max-w-3xl">
-				Aquí puedes agregar contenido personalizado sobre tu proyecto.
-			</p>
-			<p class="text-xl text-gray-600 mb-4 max-w-3xl">
-				La documentación técnica está disponible en la sección de documentación.
-			</p>
-		</div>
-	</section>
+	<!-- Content Section -->
+	<Content />
+
+	<!-- Footer -->
+	<Footer />
 </MainLayout>

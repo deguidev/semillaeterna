@@ -1,0 +1,200 @@
+---
+// Carruseles de libros de la Biblia
+const antiguoTestamento = [
+	"Génesis", "Éxodo", "Levítico", "Números", "Deuteronomio",
+	"Josué", "Jueces", "Rut", "1 Samuel", "2 Samuel",
+	"1 Reyes", "2 Reyes", "1 Crónicas", "2 Crónicas", "Esdras",
+	"Nehemías", "Ester", "Job", "Salmos", "Proverbios",
+	"Eclesiastés", "Cantares", "Isaías", "Jeremías", "Lamentaciones",
+	"Ezequiel", "Daniel", "Oseas", "Joel", "Amós",
+	"Abdías", "Jonás", "Miqueas", "Nahúm", "Habacuc",
+	"Sofonías", "Hageo", "Zacarías", "Malaquías"
+];
+
+const nuevoTestamento = [
+	"Mateo", "Marcos", "Lucas", "Juan", "Hechos",
+	"Romanos", "1 Corintios", "2 Corintios", "Gálatas", "Efesios",
+	"Filipenses", "Colosenses", "1 Tesalonicenses", "2 Tesalonicenses", "1 Timoteo",
+	"2 Timoteo", "Tito", "Filemón", "Hebreos", "Santiago",
+	"1 Pedro", "2 Pedro", "1 Juan", "2 Juan", "3 Juan",
+	"Judas", "Apocalipsis"
+];
+---
+
+<section class="carousel-section">
+	<div class="carousel-container">
+		<!-- Antiguo Testamento Carousel -->
+		<div class="carousel-wrapper">
+			<div class="carousel-track-container">
+				<div class="carousel-track" id="carousel-at">
+					{antiguoTestamento.map((libro) => (
+						<div class="book-card">
+							<span class="book-name">{libro}</span>
+						</div>
+					))}
+					<!-- Duplicar para efecto infinito -->
+					{antiguoTestamento.map((libro) => (
+						<div class="book-card">
+							<span class="book-name">{libro}</span>
+						</div>
+					))}
+				</div>
+			</div>
+		</div>
+
+		<!-- Nuevo Testamento Carousel -->
+		<div class="carousel-wrapper">
+			<div class="carousel-track-container">
+				<div class="carousel-track carousel-track-reverse" id="carousel-nt">
+					{nuevoTestamento.map((libro) => (
+						<div class="book-card">
+							<span class="book-name">{libro}</span>
+						</div>
+					))}
+					<!-- Duplicar para efecto infinito -->
+					{nuevoTestamento.map((libro) => (
+						<div class="book-card">
+							<span class="book-name">{libro}</span>
+						</div>
+					))}
+				</div>
+			</div>
+		</div>
+	</div>
+</section>
+
+<style>
+	.carousel-section {
+		background: transparent;
+		padding: 0;
+		overflow: hidden;
+		position: relative;
+	}
+
+	.carousel-container {
+		max-width: 100%;
+		margin: 0 auto;
+	}
+
+	.carousel-wrapper {
+		margin-bottom: 12px;
+	}
+
+	.carousel-wrapper:last-child {
+		margin-bottom: 0;
+	}
+
+	.carousel-track-container {
+		overflow: hidden;
+		position: relative;
+		padding: 10px 0;
+	}
+
+	.carousel-track-container::before,
+	.carousel-track-container::after {
+		content: '';
+		position: absolute;
+		top: 0;
+		bottom: 0;
+		width: 100px;
+		z-index: 2;
+		pointer-events: none;
+	}
+
+	.carousel-track-container::before {
+		left: 0;
+		background: linear-gradient(90deg, #15171F, transparent);
+	}
+
+	.carousel-track-container::after {
+		right: 0;
+		background: linear-gradient(270deg, #15171F, transparent);
+	}
+
+	.carousel-track {
+		display: flex;
+		gap: 20px;
+		animation: scroll-left 60s linear infinite;
+		width: fit-content;
+	}
+
+	.carousel-track-reverse {
+		animation: scroll-right 60s linear infinite;
+	}
+
+	.carousel-track:hover {
+		animation-play-state: paused;
+	}
+
+	@keyframes scroll-left {
+		0% {
+			transform: translateX(0);
+		}
+		100% {
+			transform: translateX(-50%);
+		}
+	}
+
+	@keyframes scroll-right {
+		0% {
+			transform: translateX(-50%);
+		}
+		100% {
+			transform: translateX(0);
+		}
+	}
+
+	.book-card {
+		flex-shrink: 0;
+		background: rgba(255, 172, 200, 0.08);
+		border: 1px solid rgba(255, 172, 200, 0.2);
+		border-radius: 8px;
+		padding: 8px 18px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		transition: all 0.3s ease;
+		backdrop-filter: blur(10px);
+	}
+
+	.book-card:hover {
+		background: rgba(255, 172, 200, 0.15);
+		border-color: #FFACC8;
+		transform: translateY(-2px);
+		box-shadow: 0 6px 16px rgba(255, 0, 135, 0.3);
+	}
+
+	.book-name {
+		color: #FFFFFF;
+		font-weight: 500;
+		font-size: 0.8rem;
+		white-space: nowrap;
+	}
+
+	/* Responsive */
+	@media (max-width: 768px) {
+		.carousel-section {
+			padding: 30px 0 0 0;
+		}
+
+		.carousel-wrapper {
+			margin-bottom: 20px;
+		}
+
+		.book-card {
+			padding: 10px 18px;
+		}
+
+		.book-name {
+			font-size: 0.8rem;
+		}
+
+		.carousel-track {
+			animation-duration: 40s;
+		}
+
+		.carousel-track-reverse {
+			animation-duration: 40s;
+		}
+	}
+</style>
