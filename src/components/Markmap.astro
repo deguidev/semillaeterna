@@ -70,61 +70,119 @@ const assetsStr = JSON.stringify(assets ?? {});
   <svg id={elementId} class="markmap-svg" xmlns="http://www.w3.org/2000/svg" data-markmap-data={dataStr}></svg>
 </div>
 
-<style>
-  .markmap-wrapper {
-    background: #f9f7f0; /* Fondo blanco amarillento suave para el contenedor */
-    border-radius: 0.5rem;
-    overflow: hidden;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); /* Sutil sombra para mejor contraste */
-  }
-  
-  .markmap-svg {
-    width: 100%;
-    height: 100%;
-    background: #fff7d8; /* Fondo ligeramente más claro para el SVG */
-  }
-  
-  /* Asegurar que el fondo se vea bien en todos los navegadores */
-  @media (forced-colors: active) {
-    .markmap-svg {
-      forced-color-adjust: none;
-    }
-  }
-</style>
 
 <script>
   import { Markmap } from 'markmap-view';
+
+  // Función para obtener los colores según el tema actual
+  function getColorFunction() {
+    const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+    
+    const colors = isDark
+      ? ['#60a5fa', '#34d399', '#fbbf24', '#f87171', '#a78bfa', '#fb923c', '#22d3ee', '#fb7185']
+      : ['#2563eb', '#059669', '#d97706', '#dc2626', '#7c3aed', '#ea580c', '#0891b2', '#e11d48'];
+    
+    return (node: any) => colors[node.state.id % colors.length];
+  }
 
   // Función para inicializar un markmap específico
   function initializeMarkmap(svg: SVGElement) {
     const dataStr = svg.getAttribute('data-markmap-data');
     
     if (!dataStr) {
-      // No se encontraron datos en el SVG
       return;
     }
 
     try {
       const data = JSON.parse(dataStr);
       
-      // Inicializando Markmap
-      
-      const mm = Markmap.create(svg, {
+      const mm = new Markmap(svg, {
         duration: 500,
         maxWidth: 0,
-        initialExpandLevel: 10,  // Asegurarse de que todos los niveles se muestren
-        fitRatio: 0.95,
-        nodeMinHeight: 16,       // Altura mínima para los nodos
-        spacingVertical: 5,      // Espaciado vertical entre nodos
-        spacingHorizontal: 80,   // Espaciado horizontal entre nodos
-        paddingX: 8,             // Relleno horizontal
-      }, data);
+        initialExpandLevel: -1,  // Expandir todos los niveles
+        fitRatio: 0.9,           // Ratio de ajuste para dejar margen
+        nodeMinHeight: 16,
+        spacingVertical: 5,
+        spacingHorizontal: 80,
+        paddingX: 8,
+        color: getColorFunction(),
+        autoFit: true,           // Ajuste automático
+        zoom: true,              // Habilitar zoom
+        pan: true,               // Habilitar paneo
+      });
       
-      // Markmap inicializado exitosamente
+      mm.setData(data);
+      
+      // Guardar la instancia para poder actualizarla
+      (svg as any).__markmap__ = mm;
+      
+      // Forzar ajuste completo del gráfico después de renderizar
+      setTimeout(() => {
+        mm.fit();
+        updateTextColors();
+      }, 150);
       
     } catch (err) {
-      // Error al inicializar Markmap
+      console.error('Error al inicializar Markmap:', err);
     }
+  }
+
+  // Función para actualizar el color del texto en el SVG
+  function updateTextColors() {
+    const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+    const textColor = isDark ? '#ffffff' : '#1e293b';
+    
+    const markmapSvgs = document.querySelectorAll('.markmap-svg');
+    markmapSvgs.forEach((svg) => {
+      // Actualizar TODOS los elementos de texto sin excepción
+      svg.querySelectorAll('text').forEach((el: any) => {
+        el.style.fill = textColor;
+        el.setAttribute('fill', textColor);
+      });
+      
+      // Actualizar todos los tspan (texto dentro de los nodos)
+      svg.querySelectorAll('tspan').forEach((el: any) => {
+        el.style.fill = textColor;
+        el.setAttribute('fill', textColor);
+      });
+      
+      // Actualizar todos los elementos foreignObject (si existen)
+      svg.querySelectorAll('foreignObject').forEach((el: any) => {
+        el.style.color = textColor;
+      });
+      
+      // Actualizar todos los divs dentro del SVG
+      svg.querySelectorAll('div').forEach((el: any) => {
+        el.style.color = textColor;
+      });
+      
+      // Actualizar enlaces
+      svg.querySelectorAll('a').forEach((el: any) => {
+        el.style.fill = textColor;
+        el.style.color = textColor;
+        el.setAttribute('fill', textColor);
+      });
+      
+      // Actualizar cualquier span
+      svg.querySelectorAll('span').forEach((el: any) => {
+        el.style.color = textColor;
+      });
+    });
+  }
+
+  // Función para actualizar los colores cuando cambia el tema
+  function updateMarkmapTheme() {
+    const markmapSvgs = document.querySelectorAll('.markmap-svg');
+    markmapSvgs.forEach((svg) => {
+      const mm = (svg as any).__markmap__;
+      if (mm) {
+        mm.setOptions({ color: getColorFunction() });
+        mm.fit();
+      }
+    });
+    
+    // Actualizar colores de texto
+    updateTextColors();
   }
 
   // Ocultar cualquier imagen estática que se esté mostrando
@@ -136,13 +194,10 @@ const assetsStr = JSON.stringify(assets ?? {});
 
   // Inicializar el markmap
   document.addEventListener('DOMContentLoaded', () => {
-    // Ocultar overlay estático
     eval(hideStaticOverlay);
     
-    // Inicializar markmap
     const markmapSvgs = document.querySelectorAll('.markmap-svg');
     markmapSvgs.forEach((svg) => {
-      // Limpiar cualquier contenido previo
       while (svg.firstChild) {
         svg.removeChild(svg.firstChild);
       }
@@ -152,7 +207,6 @@ const assetsStr = JSON.stringify(assets ?? {});
 
   // También inicializar si el DOM ya está listo
   if (document.readyState !== 'loading') {
-    // Pequeño retraso para asegurar que el DOM esté listo
     setTimeout(() => {
       eval(hideStaticOverlay);
       const markmapSvgs = document.querySelectorAll('.markmap-svg');
@@ -164,6 +218,24 @@ const assetsStr = JSON.stringify(assets ?? {});
       });
     }, 50);
   }
+
+  // Observar cambios en el atributo data-theme para actualizar los colores
+  const observer = new MutationObserver((mutations) => {
+    mutations.forEach((mutation) => {
+      if (mutation.type === 'attributes' && mutation.attributeName === 'data-theme') {
+        updateMarkmapTheme();
+      }
+    });
+  });
+
+  // Observar el elemento html para detectar cambios de tema
+  observer.observe(document.documentElement, {
+    attributes: true,
+    attributeFilter: ['data-theme']
+  });
+  
+  // Aplicar colores de texto al cargar
+  setTimeout(() => updateTextColors(), 200);
 </script>
 
 <style>
@@ -173,10 +245,45 @@ const assetsStr = JSON.stringify(assets ?? {});
     border-radius: 12px;
     overflow: hidden;
     background: var(--sl-color-bg);
+    transition: background-color 0.3s ease, border-color 0.3s ease;
   }
 
   .markmap-svg {
     width: 100%;
     height: 100%;
   }
+
+  /* Texto de los nodos - forzar colores según tema */
+  .markmap-svg text,
+  .markmap-svg tspan,
+  .markmap-svg a,
+  .markmap-svg foreignObject,
+  .markmap-svg div,
+  .markmap-svg span {
+    transition: fill 0.3s ease, color 0.3s ease !important;
+  }
+  
+  /* Modo claro - texto oscuro */
+  :root[data-theme='light'] .markmap-svg text,
+  :root[data-theme='light'] .markmap-svg tspan,
+  :root[data-theme='light'] .markmap-svg a,
+  :root[data-theme='light'] .markmap-svg foreignObject,
+  :root[data-theme='light'] .markmap-svg div,
+  :root[data-theme='light'] .markmap-svg span {
+    fill: #1e293b !important;
+    color: #1e293b !important;
+  }
+
+  /* Modo oscuro - texto BLANCO para TODOS los niveles */
+  :root[data-theme='dark'] .markmap-svg text,
+  :root[data-theme='dark'] .markmap-svg tspan,
+  :root[data-theme='dark'] .markmap-svg a,
+  :root[data-theme='dark'] .markmap-svg foreignObject,
+  :root[data-theme='dark'] .markmap-svg foreignObject *,
+  :root[data-theme='dark'] .markmap-svg div,
+  :root[data-theme='dark'] .markmap-svg span {
+    fill: #ffffff !important;
+    color: #ffffff !important;
+  }
+
 </style>
