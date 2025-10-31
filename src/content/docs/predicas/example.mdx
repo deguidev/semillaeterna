@@ -1,57 +1,70 @@
 ---
-title: Mapa Mental de Prédicas - Sample
-description: Ejemplo de integración con Markmap para visualizar prédicas
+title: Textos Bíblicos
+description: Una colección de versículos bíblicos con sus reflexiones
 ---
 
-# Ejemplo con Markmap
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+import { Steps } from '@astrojs/starlight/components';
 
-import Markmap from '@components/Markmap.astro';
 
-El siguiente ejemplo convierte un bloque de Markdown en un mapa mental interactivo gracias a **Markmap**. Modifica el contenido para adaptarlo a tus enseñanzas.
+## Santiago 1:6-8
 
-```md
-# Serie: Fundamentos de la Fe
+<Tabs>
+  <TabItem value="texto-santiago" label="📜 Texto Bíblico">
+    <Aside type="note">
+      "Pero pida con fe, no dudando nada; porque el que duda es semejante a la onda del mar, que es arrastrada por el viento y echada de una parte a otra. No piense, pues, quien tal haga, que recibirá cosa alguna del Señor. El hombre de doble ánimo es inconstante en todos sus caminos."
+      
+      *— Santiago 1:6-8 (RVR1960)*
+    </Aside>
+  </TabItem>
+  
+  <TabItem value="reflexion-santiago" label="💭 Reflexión">
+    ### 📖 Significado
+    
+    Este pasaje nos muestra la importancia de la fe genuina. La duda nos vuelve inestables, como olas del mar, mientras que la fe nos da firmeza y seguridad en nuestro caminar con Dios.
+    
+    ### 💡 Aplicación Práctica
+    
+    - Orar con confianza absoluta en Dios
+    - Evitar la doble mentalidad en la fe
+    - Buscar estabilidad en la Palabra
+    
+    ### ❓ Preguntas para reflexionar
+    
+    1. ¿En qué situaciones tiendo a dudar de Dios?
+    2. ¿Cómo puedo fortalecer mi fe diariamente?
+    3. ¿De qué manera puedo ser más constante en mi vida espiritual?
+  </TabItem>
+</Tabs>
 
-## La Salvación
-- Por gracia mediante la fe
-- No por obras
-- Seguridad eterna
+## Josué 1:9
 
-## Crecimiento Espiritual
-- Oración diaria
-- Estudio bíblico
-- Comunión con la iglesia
-- Servicio
-
-## Misión
-- Compartir el evangelio
-- Hacer discípulos
-```
-
-<Markmap
-  content={`
-# Serie: Fundamentos de la Fe
-
-## La Salvación
-- Por gracia mediante la fe
-- No por obras
-- Seguridad eterna
-
-## Crecimiento Espiritual
-- Oración diaria
-- Estudio bíblico
-- Comunión con la iglesia
-- Servicio
-
-## Misión
-- Compartir el evangelio
-- Hacer discípulos
-`}
-  height="600px"
-/>
-
-## Recursos Adicionales
-
-- Documentación oficial: [markmap.js.org](https://markmap.js.org/)
-- Biblioteca principal: `markmap-lib`
-- Visor interactivo: `markmap-view`
+<Tabs>
+  <TabItem value="texto-josue" label="📜 Texto Bíblico">
+    <Aside type="note">
+      "Mira que te mando que te esfuerces y seas valiente; no temas ni desmayes, porque Jehová tu Dios estará contigo en dondequiera que vayas."
+      
+      *— Josué 1:9 (RVR1960)*
+    </Aside>
+  </TabItem>
+  
+  <TabItem value="reflexion-josue" label="💭 Reflexión">
+    ### 📖 Significado
+    
+    Dios nos llama a ser valientes y confiar en Su presencia constante. No debemos temer porque Él siempre está con nosotros, guiando y sosteniendo cada paso.
+    
+    ### 💡 Aplicación Práctica
+    
+    - Enfrentar los desafíos con valentía
+    - Recordar que Dios está presente
+    - Mantener la fe en medio de las dificultades
+    
+    ### ❓ Preguntas para reflexionar
+    
+    1. ¿Qué situaciones me hacen sentir temor o inseguridad?
+    2. ¿Cómo puedo recordar la presencia de Dios en mi vida diaria?
+    3. ¿De qué manera puedo demostrar valentía en mi fe?
+  </TabItem>
+</Tabs>
