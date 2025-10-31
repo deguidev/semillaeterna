@@ -6,16 +6,53 @@ interface Props {
 	description?: string;
 }
 
-const { title, description = 'Bienvenido a mi sitio' } = Astro.props;
+const { 
+  title = 'Semilla Eterna - Crecimiento Espiritual y Enseñanzas Bíblicas', 
+  description = 'Explora profundas enseñanzas bíblicas, estudios devocionales y recursos para fortalecer tu fe. Encuentra guías prácticas para tu crecimiento espiritual diario basadas en la Palabra de Dios.' 
+} = Astro.props;
+
+// Generar URL canónica segura
+const siteUrl = 'https://semillaeterna.vercel.app'; 
+const canonicalUrl = new URL(Astro.url.pathname, siteUrl).toString();
 ---
 
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" prefix="og: https://ogp.me/ns#">
 <head>
+	<!-- Primary Meta Tags -->
 	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
 	<meta name="description" content={description}>
-	<title>{title}</title>
+	<meta name="author" content="Semilla Eterna">
+	<meta name="keywords" content="vida cristiana, estudios bíblicos, crecimiento espiritual, fe, enseñanza cristiana">
+	<meta name="robots" content="index, follow">
+	
+	<!-- Canonical URL -->
+	<link rel="canonical" href={canonicalUrl} />
+
+	<!-- Open Graph / Facebook -->
+	<meta property="og:type" content="website">
+	<meta property="og:url" content={canonicalUrl} />
+	<meta property="og:title" content={title}>
+	<meta property="og:description" content={description}>
+	<meta property="og:site_name" content="Semilla Eterna">
+	<meta property="og:locale" content="es_ES">
+	
+	<!-- Twitter -->
+	<meta name="twitter:card" content="summary_large_image">
+	<meta name="twitter:title" content={title}>
+	<meta name="twitter:description" content={description}>
+	<meta name="twitter:site" content="@semillaeterna">
+
+	<!-- Favicon -->
+	<link rel="icon" type="image/png" href="/favicon.ico" sizes="32x32">
+	<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+
+	<!-- Theme Color -->
+	<meta name="theme-color" content="#ffffff">
+
+	<!-- Title (should be the last meta tag) -->
+	<title>{title} | Semilla Eterna</title>
 </head>
 <body class="font-sans leading-relaxed text-gray-800">
 	<slot />
